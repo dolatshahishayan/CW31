@@ -3,24 +3,24 @@ import java.util.*;
 
 private Map<String, Student> studentRecords = new HashMap<>();
 
-public void addStudent(String name, int score) throws InvalidScoreException {
+public void addStudent(String name, int score) {
     if (studentRecords.containsKey(name)) {
-        throw new IllegalArgumentException("Student already exists.");
+        throw new StudentAlreadyExistsException();
     }
     studentRecords.put(name, new Student(name, score));
 }
 
-public void updateScore(String name, int newScore) throws InvalidScoreException {
+public void updateScore(String name, int newScore) {
     Student student = studentRecords.get(name);
     if (student == null) {
-        throw new NoSuchElementException("Student not found.");
+        throw new NoElementFoundException();
     }
     student.setScore(newScore);
 }
 
 public void removeStudent(String name) {
     if (studentRecords.remove(name) == null) {
-        throw new NoSuchElementException("Student not found.");
+        throw new NoElementFoundException();
     }
     studentRecords.remove(name);
 }
