@@ -5,7 +5,6 @@ import ir.maktabsharif.cw31.dto.author.AuthorSaveUpdateRequest;
 import ir.maktabsharif.cw31.mapper.AuthorMapper;
 import ir.maktabsharif.cw31.model.Author;
 import ir.maktabsharif.cw31.service.author.AuthorService;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
