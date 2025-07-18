@@ -16,9 +16,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     public static final PathPatternRequestMatcher loginPath = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/authors/login");
