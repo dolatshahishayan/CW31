@@ -33,7 +33,7 @@ public class JwtUtil {
 
     public void validateToken(String token, String username, HttpServletRequest request) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        boolean valid = username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        boolean valid = username.equals(userDetails.getUsername()) && isTokenExpired(token);
         if (valid) {
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -62,11 +62,6 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
-    }
-
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        String username = extractUsername(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {

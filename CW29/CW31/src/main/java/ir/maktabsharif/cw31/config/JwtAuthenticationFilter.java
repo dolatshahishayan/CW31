@@ -52,7 +52,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
     }
 
     @Override
-    public void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+    public void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult){
         UserDetailsImpl principal = (UserDetailsImpl) authResult.getPrincipal();
         String token = jwtUtil.generateToken(principal);
         response.addHeader("Authorization", "Bearer " + token);
