@@ -3,6 +3,7 @@ package ir.maktabsharif.cw31.config;
 import ir.maktabsharif.cw31.util.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 @EnableWebSecurity
@@ -22,6 +24,10 @@ import org.springframework.security.web.servlet.util.matcher.PathPatternRequestM
 @EnableMethodSecurity
 public class SecurityConfig {
 
+private final UserDetailsService  userDetailsService;
+    public SecurityConfig(@Lazy UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -36,11 +42,6 @@ public class SecurityConfig {
         return providerManager;
     }
 
-//    @Bean
-//    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-//        return authConfig.getAuthenticationManager();
-//    }
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity security, JwtUtil jwtUtil, AuthenticationManager authenticationManager) throws Exception {
@@ -50,10 +51,12 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(JwtAuthenticationFilter.loginPath,
-                                PathPatternRequestMatcher.withDefaults().matcher("/error"),PathPatternRequestMatcher.withDefaults().matcher("/api/authors/save"),PathPatternRequestMatcher.withDefaults().matcher("/**")).permitAll()
+                                PathPatternRequestMatcher.withDefaults().matcher("/error")).permitAll()
                         .anyRequest().authenticated()
                 ).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, authenticationManager), AnonymousAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, authenticationManager,userDetailsService), AnonymousAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, authenticationManager,userDetailsService), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthorizationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         return security.build();
     }

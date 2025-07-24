@@ -7,10 +7,7 @@ import ir.maktabsharif.cw31.model.Author;
 import ir.maktabsharif.cw31.service.author.AuthorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/authors")
@@ -22,6 +19,18 @@ public class AuthorController {
 
     @PostMapping("/save")
     public ResponseEntity<AuthorFindResponse> saveAuthor(@RequestBody AuthorSaveUpdateRequest request) {
+        Author save = authorService.save(request);
+        return ResponseEntity.ok(authorMapper.mapToResponse(save));
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String>  deleteAuthor(@RequestParam Integer authorId) {
+        authorService.delete(authorId);
+        return ResponseEntity.ok("Author has been deleted");
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<AuthorFindResponse> updateAuthor(@RequestBody AuthorSaveUpdateRequest request) {
         Author save = authorService.save(request);
         return ResponseEntity.ok(authorMapper.mapToResponse(save));
     }

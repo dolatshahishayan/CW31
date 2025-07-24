@@ -39,6 +39,11 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    public void delete(Integer authorId) {
+        authorRepository.deleteById(authorId);
+    }
+
+    @Override
     public Author findByUsername(String username) {
         return authorRepository.findByUsername(username).orElseThrow(NoSuchElementException::new);
     }

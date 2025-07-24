@@ -13,6 +13,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
@@ -22,15 +24,18 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
     public static final PathPatternRequestMatcher loginPath = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/api/authors/login");
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final JwtUtil jwtUtil;
+    private final UserDetailsService  userDetailsService;
 
-    protected JwtAuthenticationFilter(JwtUtil jwtUtil, AuthenticationManager authenticationManager) {
+    protected JwtAuthenticationFilter(JwtUtil jwtUtil, AuthenticationManager authenticationManager, UserDetailsService userDetailsService) {
         super(loginPath, authenticationManager);
         this.jwtUtil = jwtUtil;
+        this.userDetailsService = userDetailsService;
     }
 
     public Authentication authenticationMapper(HttpServletRequest httpServletRequest) throws IOException {
         AuthorLoginRequest authorLoginRequest = objectMapper.readValue(httpServletRequest.getInputStream(), AuthorLoginRequest.class);
-        return new UsernamePasswordAuthenticationToken(authorLoginRequest.getUsername(), authorLoginRequest.getPassword());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(authorLoginRequest.getUsername());
+        return new UsernamePasswordAuthenticationToken(userDetails, authorLoginRequest.getPassword());
     }
 
     @Override
@@ -48,15 +53,9 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
     @Override
     public void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-        System.out.println("in successful method");
         UserDetailsImpl principal = (UserDetailsImpl) authResult.getPrincipal();
-        System.out.println("55");
         String token = jwtUtil.generateToken(principal);
-        System.out.println("57");
         response.addHeader("Authorization", "Bearer " + token);
-        System.out.println("59");
-        super.successfulAuthentication(request, response, chain, authResult);
-        System.out.println("out successful authentication");
     }
 
     @Override
